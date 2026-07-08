@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { validate } from "../middlewares/validate.middleware";
 import { registerSchema, loginSchema } from "../schemas/auth.schema";
-import { register, login } from "../controllers/auth.controller";
+import { register, login, logout } from "../controllers/auth.controller";
+import { authMiddleware } from "../middlewares/auth.middleware";
 
 export const authRoutes = Router();
 
@@ -121,3 +122,30 @@ authRoutes.post("/register", validate(registerSchema), register);
  *         description: Email or password is not correct
  */
 authRoutes.post("/login", validate(loginSchema), login);
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout user and invalidate JWT token
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully Logged Out
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Successfully Logged Out
+ *       401:
+ *         description: Unauthorized or token invalid
+ */
+authRoutes.post("/logout", authMiddleware, logout);

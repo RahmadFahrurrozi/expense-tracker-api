@@ -1,16 +1,17 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { JWTPayload } from "../types/express";
+import redis from "../utils/redis";
 
 // Middleware = fungsi yang jalan di ANTARA request masuk dan controller
 // Signature: (req, res, next) => void
 // next() = "lanjut ke middleware/controller berikutnya"
 // next(error) = "ada error, lewati ke error handler"
-export const authMiddleware = (
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): void => {
+): Promise<void> => {
   // Ambil token dari header Authorization
   // Format yang benar: "Bearer eyJhbGciOiJIUzI1NiIsInR..."
   const authHeader = req.headers.authorization;
@@ -24,6 +25,17 @@ export const authMiddleware = (
   const token = authHeader.split(" ")[1];
 
   try {
+    // Cek apakah token masuk dalam blacklist di Redis (misalnya karena logout)
+    const isBlacklisted = await redis.get(`blacklist:${token}`).catch((err) => {
+      console.error("Redis error checking blacklist:", err);
+      return null;
+    });
+
+    if (isBlacklisted) {
+      res.status(401).json({ error: "Token tidak valid atau sudah logout" });
+      return;
+    }
+
     // jwt.verify(token, secret) → validasi signature + expiry
     // Kalau token palsu atau expired → throw error
     const decoded = jwt.verify(
@@ -40,3 +52,4 @@ export const authMiddleware = (
     res.status(401).json({ error: "Token tidak valid atau sudah expired" });
   }
 };
+

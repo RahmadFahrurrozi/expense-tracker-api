@@ -42,3 +42,49 @@ describe("POST /api/auth/register", () => {
     expect(response.body.error).toBe("Validasi gagal");
   });
 });
+
+describe("POST /api/auth/logout", () => {
+  it("should logout successfully and invalidate token", async () => {
+    const email = `logoutuser-${Date.now()}@example.com`;
+    
+    // Register
+    await request(app)
+      .post("/api/auth/register")
+      .send({
+        name: "Logout User",
+        email,
+        password: "password123",
+      });
+
+    // Login
+    const loginRes = await request(app)
+      .post("/api/auth/login")
+      .send({
+        email,
+        password: "password123",
+      });
+
+    const token = loginRes.body.token;
+
+    // Logout
+    const logoutRes = await request(app)
+      .post("/api/auth/logout")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(logoutRes.status).toBe(200);
+    expect(logoutRes.body.message).toBe("Successfully Logged Out");
+
+    // Try to access logout again (should fail because token is now blacklisted)
+    const secondLogoutRes = await request(app)
+      .post("/api/auth/logout")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(secondLogoutRes.status).toBe(401);
+  });
+
+  it("should return 401 if token is missing", async () => {
+    const response = await request(app).post("/api/auth/logout");
+    expect(response.status).toBe(401);
+  });
+});
+
