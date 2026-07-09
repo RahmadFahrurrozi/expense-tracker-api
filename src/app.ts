@@ -42,6 +42,8 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+
+
 // ── Routes ───────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/expenses", expenseRoutes);
