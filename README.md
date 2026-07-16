@@ -161,6 +161,4 @@ Interactive docs are served live at `/docs` once the server's running.
 
 <div align="center">
 
-Built with a "learn it right the first time" mindset.
-
 </div>
