@@ -64,7 +64,7 @@ const swaggerOptions = {
       description: "REST API untuk mencatat pengeluaran pribadi",
     },
     servers: [
-      { url: "/api", description: "Default (Current Host)" },
+      { url: "/api", description: "Production (Current Host)" },
       { url: `http://localhost:${PORT}/api`, description: "Local Development" },
     ],
     components: {
@@ -73,11 +73,7 @@ const swaggerOptions = {
       },
     },
   },
-  apis: [
-    "./src/routes/*.ts",
-    "./src/routes/*.js",
-    "./dist/routes/*.js",
-  ],
+  apis: ["./src/routes/*.ts", "./src/routes/*.js", "./dist/routes/*.js"],
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
