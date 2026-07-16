@@ -59,9 +59,10 @@ const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Expense Tracker API",
+      title: "Sisa Brapa API",
       version: "1.0.0",
-      description: "REST API untuk mencatat pengeluaran pribadi",
+      description:
+        "A secure REST API for tracking personal expenses, budgets, subscriptions, and savings goals built with JWT auth, smart budgeting rules, and built-in analytics for spending trends.",
     },
     servers: [
       { url: "/api", description: "Production (Current Host)" },
@@ -105,7 +106,7 @@ app.get("/health", (_req, res) => {
 // Welcome / Root Endpoint
 app.get("/", (_req, res) => {
   res.json({
-    message: "Welcome to Expense Tracker API",
+    message: "Welcome to Sisa Brapa API",
     docs: "/docs",
     health: "/health",
   });
