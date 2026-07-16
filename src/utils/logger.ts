@@ -20,30 +20,34 @@ const prodFormat = winston.format.combine(
   winston.format.json(),
 );
 
-// Inisialisasi Winston Logger
-const logger = winston.createLogger({
-  level: process.env.NODE_ENV === "production" ? "info" : "debug",
-  format: prodFormat,
-  transports: [
-    // Simpan seluruh log gabungan (info, warn, error) ke logs/combined.log
+const transports: winston.transport[] = [];
+
+if (process.env.NODE_ENV === "production" || process.env.VERCEL) {
+  // Di production / Vercel, cukup log ke Console karena filesystem bersifat read-only
+  transports.push(
+    new winston.transports.Console({
+      format: prodFormat,
+    }),
+  );
+} else {
+  // Di local development, log ke Console (berwarna) dan ke File
+  transports.push(
+    new winston.transports.Console({
+      format: devFormat,
+    }),
     new winston.transports.File({
       filename: path.join(logDirectory, "combined.log"),
     }),
-    // Simpan khusus log error ke logs/error.log
     new winston.transports.File({
       filename: path.join(logDirectory, "error.log"),
       level: "error",
     }),
-  ],
-});
-
-// Jika bukan di production (lokal dev), tampilkan juga log ke Console dengan devFormat
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: devFormat,
-    }),
   );
 }
+
+const logger = winston.createLogger({
+  level: process.env.NODE_ENV === "production" ? "info" : "debug",
+  transports,
+});
 
 export default logger;
